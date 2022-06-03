@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bank</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="http://libs.baidu.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+<body>
+<div id="container" class="page-container">
+    <div class="main-content">
+        <div class="page-header" style="position: relative">
+            <h1>Bank<small style="margin-left: 20px">Main</small></h1>
+        </div>
+        <p class="font-bold">Card Number: <span id="cardNumber" class="color-green"></span></p>
+        <p class="font-bold">Nick Name: <span id="nickName" class="color-green"></span></p>
+        <p class="font-bold">Balance: <span id="balance" class="color-green"></span></p>
+
+        <hr>
+
+        <div class="form-group">
+            <label for="amountInput">Amount</label>
+            <input type="text" class="form-control input-lg" id="amountInput" placeholder="Amount">
+        </div>
+        <button type="submit" class="btn btn-success half-width" onclick="addAmount()">Add</button>
+        <button type="submit" class="btn btn-primary half-width" style="margin-left: 10px" onclick="subAmount()">Sub
+        </button>
+
+        <hr>
+        <div style="height: 25vh;max-height: 25vh;overflow: auto">
+            <table id="table" border="1" style="width: 100%">
+                <tr>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Operate</th>
+                    <th>Balance</th>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+<script src="http://libs.baidu.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+<script src="request.js" defer></script>
+
+<script>
+    let recordList = []
+    let user = null
+    const thStr = `<tr>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Operate</th>
+                    <th>Balance</th>
+                </tr>`
+
+    const getRecordList = (callback) => {
+        get({
+            url: `record/getList/${user.id}`,
+            successFun: res => {
+                recordList = res
+                $('#table').html(thStr)
+                recordList.forEach(item => {
+                    const tableHtml = $('#table').html()
+                    $('#table').html(`${tableHtml}<tr>
+                    <td>${item.dateStr}</td>
+                    <td>${item.amount}</td>
+                    <td>${item.operation === 0 ? 'Add' : 'Sub'}</td>
+                    <td>${item.balance}</td>
+                </tr>`)
+                })
+                if (callback && typeof callback === 'function') {
+                    callback()
+                }
+            }
+        })
+    }
+
+    const addAmount = () => {
+        doOperate(0)
+    }
+
+    const subAmount = () => {
+        doOperate(1)
+    }
+
+    const doOperate = (operate) => {
+        const data = {
+            id: user.id,
+            operate,
+            amount: $('#amountInput').val()
+        }
+        post({
+            url: 'account/operate',
+            data,
+            successFun: res => {
+                user = res
+                getRecordList(() => {
+                    transUserInfo()
+                    $('#amountInput').val('')
+                    alert('Success')
+                })
+            }
+        })
+    }
+
+    const transUserInfo = () => {
+        $('#cardNumber').text(user.number)
+        $('#nickName').text(user.nickName)
+        $('#balance').text(user.balance)
+    }
+
+    const getUser = (id, callback) => {
+        get({
+            url: `account/getOne/${id}`,
+            successFun: res => {
+                user = res
+                if (callback && typeof callback === 'function') {
+                    callback()
+                }
+            }
+        })
+    }
+
+    $(document).ready(() => {
+        if (!sessionStorage.getItem("user")) {
+            window.location.href = './index.html'
+        }
+        getUser(JSON.parse(sessionStorage.getItem("user")).id, () => {
+            transUserInfo()
+            getRecordList()
+        })
+    })
+</script>
+
+<style>
+    .main-content {
+        height: 80vh;
+        max-height: 80vh;
+    }
+
+    .font-bold {
+        font-size: 20px;
+        font-weight: bold;
+    }
+</style>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bank</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="http://libs.baidu.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+<body>
+<div id="container" class="page-container">
+    <div class="main-content">
+        <div class="page-header" style="position: relative">
+            <h1>Bank<small style="margin-left: 20px">Register</small></h1>
+        </div>
+        <a href="index.html" style="position: absolute;right: 5px;top: 5px;font-size: 16px">To Login</a>
+
+        <form>
+            <div class="form-group">
+                <label for="nameInput">Name</label>
+                <input type="text" class="form-control input-lg" id="nameInput" placeholder="Name">
+            </div>
+            <div class="form-group">
+                <label for="passWordInput">Password</label>
+                <input type="password" class="form-control input-lg" id="passWordInput" placeholder="Password">
+            </div>
+        </form>
+        <button type="button" class="btn btn-success content-footer" onclick="register()">Submit</button>
+    </div>
+</div>
+</body>
+</html>
+
+<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+<script src="http://libs.baidu.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+<script src="request.js" defer></script>
+
+<script>
+    const register = () => {
+        const data = {
+            nickName: $('#nameInput').val(),
+            passWord: $('#passWordInput').val()
+        }
+        post({
+            url: 'account/register',
+            data,
+            successFun: res => {
+                $('#passWordInput').val('')
+                $('#nameInput').val('')
+                alert(`Your Number Is ${res.number}, Please Save`)
+            }
+        })
+    }
+</script>
+
+<style>
+
+</style>
