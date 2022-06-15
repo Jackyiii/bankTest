@@ -1,6 +1,7 @@
 package com.example.bank.entity;
 
 import com.example.bank.entity.BaseEntity;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -14,6 +15,7 @@ import lombok.experimental.Accessors;
  * @since 2022-05-22
  */
 @Data
+
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
 public class Account extends BaseEntity {
